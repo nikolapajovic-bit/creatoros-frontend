@@ -2,6 +2,9 @@ import { apiFetch, setAccessToken, getAccessToken } from "@/lib/api/client";
 import type { AuthResponse } from "@/types/user";
 
 const API_URL = (() => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
   if (typeof window !== "undefined") {
     const port = process.env.NEXT_PUBLIC_API_PORT ?? "5000";
     return `${window.location.protocol}//${window.location.hostname}:${port}/api`;
