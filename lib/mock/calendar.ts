@@ -1,0 +1,83 @@
+import type { CalendarEvent } from "@/types/calendar";
+
+export const MOCK_EVENTS: CalendarEvent[] = [
+  {
+    id: "e1",
+    title: "Reel — Nova Beauty summer set",
+    type: "post",
+    date: "2026-08-04",
+    time: "10:00",
+    relatedBrand: "Nova Beauty",
+  },
+  {
+    id: "e2",
+    title: "Script submission — Urban Fit",
+    type: "deadline",
+    date: "2026-08-06",
+    relatedBrand: "Urban Fit",
+  },
+  {
+    id: "e3",
+    title: "Call with Café Lumen team",
+    type: "meeting",
+    date: "2026-08-07",
+    time: "15:30",
+    relatedBrand: "Café Lumen",
+  },
+  {
+    id: "e4",
+    title: "Contract signing — Agency Vrelo",
+    type: "deadline",
+    date: "2026-08-09",
+  },
+  {
+    id: "e5",
+    title: "TikTok series — Café Lumen",
+    type: "campaign",
+    date: "2026-08-10",
+    relatedBrand: "Café Lumen",
+  },
+  {
+    id: "e6",
+    title: "Story set — Aster Skincare",
+    type: "post",
+    date: "2026-08-12",
+    time: "09:00",
+    relatedBrand: "Aster Skincare",
+  },
+  {
+    id: "e7",
+    title: "Monthly analytics review",
+    type: "meeting",
+    date: "2026-08-14",
+    time: "11:00",
+  },
+  {
+    id: "e8",
+    title: "Deliverables due — Pulse Audio",
+    type: "deadline",
+    date: "2026-08-18",
+    relatedBrand: "Pulse Audio",
+  },
+  {
+    id: "e9",
+    title: "YouTube video — dedicated review",
+    type: "post",
+    date: "2026-08-20",
+    time: "18:00",
+    relatedBrand: "Urban Fit",
+  },
+  {
+    id: "e10",
+    title: "Q3 activewear campaign window",
+    type: "campaign",
+    date: "2026-08-22",
+  },
+  {
+    id: "e11",
+    title: "Brand call — new inquiry",
+    type: "meeting",
+    date: "2026-08-04",
+    time: "13:00",
+  },
+];
