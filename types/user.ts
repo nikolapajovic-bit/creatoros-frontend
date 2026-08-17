@@ -11,6 +11,7 @@ export interface User {
   hasSavedSignature?: boolean;
   savedSignatureUrl?: string;
   onboardingCompleted: boolean;
+  emailVerified: boolean;
 }
 
 export interface AuthResponse {

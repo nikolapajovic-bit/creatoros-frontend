@@ -56,3 +56,13 @@ export async function removeAvatarRequest(): Promise<User> {
   });
   return data.user;
 }
+
+export async function getSavedSignatureUrlRequest(): Promise<string> {
+  const data = await apiFetch<{ url: string }>("/auth/saved-signature-url");
+
+  return data.url;
+}
+
+export async function resendVerificationRequest(): Promise<void> {
+  await apiFetch<void>("/auth/resend-verification", { method: "POST" });
+}

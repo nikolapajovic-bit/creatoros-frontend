@@ -38,7 +38,7 @@ export default function ContractsPage() {
   if (isSender) {
     const sentContracts = sentQuery.data ?? [];
     const awaitingCount = sentContracts.filter((c) => c.status === "awaiting_signature").length;
-    const signedCount = sentContracts.filter((c) => c.status === "signed").length;
+    const signedCount = sentContracts.filter((c) => c.status === "signed").reduce((sum, c) => sum + Number(c.value), 0);
 
     return (
       <div className="space-y-6">

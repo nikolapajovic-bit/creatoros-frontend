@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { RouteGuard } from "@/components/auth/route-guard";
+import { VerifyEmailBanner } from "@/components/dashboard/verify-email-banner";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,7 +16,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Sidebar />
           <div className="md:pl-24">
             <Topbar />
-            <main className="px-6 py-6">{children}</main>
+            <main className="px-6 py-6">
+              <VerifyEmailBanner />
+              {children}
+            </main>
           </div>
         </div>
       </div>

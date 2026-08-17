@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PenLine, Loader2, Check, Sparkles } from "lucide-react";
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
 import { SignatureCanvas } from "@/components/contracts/signature-canvas";
 import { useSignContract } from "@/hooks/use-contracts";
 import { useAuthStore } from "@/store/auth-store";
+import { getSavedSignatureUrlRequest } from "@/lib/api/settings";
 
 type Step = "sign" | "save-prompt";
 
@@ -23,11 +24,23 @@ export function SignContractDialog({ contractId }: { contractId: string }) {
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
 
+  const [savedSignaturePreview, setSavedSignaturePreview] = useState<string | null>(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
   const signContract = useSignContract();
 
   const hasSaved = !!user?.hasSavedSignature;
+
+  useEffect(() => {
+    if (!useSaved || savedSignaturePreview) return;
+    setLoadingPreview(true);
+    getSavedSignatureUrlRequest()
+      .then(setSavedSignaturePreview)
+      .catch(() => setError("Could not load your saved signature"))
+      .finally(() => setLoadingPreview(false));
+  }, [useSaved, savedSignaturePreview]);
 
   function resetAndClose() {
     setStep("sign");
@@ -36,6 +49,7 @@ export function SignContractDialog({ contractId }: { contractId: string }) {
     setUseSaved(false);
     setAgreed(false);
     setError("");
+    setSavedSignaturePreview(null);
     setOpen(false);
   }
 
@@ -157,14 +171,18 @@ export function SignContractDialog({ contractId }: { contractId: string }) {
               {useSaved && hasSaved && (
                 <div>
                   <label className="text-xs font-medium text-ink-muted">Saved signature</label>
-                  <div className="mt-1.5 flex items-center justify-center rounded-xl border-2 border-dashed border-surface-border bg-white p-3">
-                    {user?.savedSignatureUrl && (
+                  <div className="mt-1.5 flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-surface-border bg-white p-3">
+                    {loadingPreview ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-ink-faint" />
+                    ) : savedSignaturePreview ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={`http://localhost:5000${user.savedSignatureUrl}`}
+                        src={savedSignaturePreview}
                         alt="Your saved signature"
-                        className="h-20 object-contain"
+                        className="h-full object-contain"
                       />
+                    ) : (
+                      <p className="text-xs text-ink-faint">Could not load preview</p>
                     )}
                   </div>
                 </div>

@@ -25,7 +25,7 @@ export interface Contract {
   creatorSigned: boolean;
   brandSigned: boolean;
   sentByBrand: boolean;
-  finalPdfUrl?: string;
+  hasFinalPdf: boolean;
   revisionRequests: RevisionRequest[];
 }
 

@@ -2,15 +2,29 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { Camera, Loader2, Check, Sparkles, ShieldCheck } from "lucide-react";
+import {
+  Camera,
+  Loader2,
+  Check,
+  Sparkles,
+  ShieldCheck,
+  Mail,
+  CheckCircle2,
+} from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ToggleSwitch } from "@/components/settings/toggle-switch";
 import { getInitials } from "@/lib/utils";
-import { useAuthStore } from "@/store/auth-store";
-import { updateProfileRequest, changePasswordRequest, uploadAvatarRequest, removeAvatarRequest } from "@/lib/api/settings";
-import { mockUpgradeToPro } from "@/lib/api/onboarding";
 import { resolveFileUrl } from "@/lib/file-url";
+import { useAuthStore } from "@/store/auth-store";
+import {
+  updateProfileRequest,
+  changePasswordRequest,
+  uploadAvatarRequest,
+  removeAvatarRequest,
+  resendVerificationRequest,
+} from "@/lib/api/settings";
+import { mockUpgradeToPro } from "@/lib/api/onboarding";
 
 export default function SettingsPage() {
   const user = useAuthStore((s) => s.user);
@@ -34,31 +48,17 @@ export default function SettingsPage() {
   const [name, setName] = useState(user?.name ?? "");
   const [profileStatus, setProfileStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [profileError, setProfileError] = useState("");
-  const avatarInputRef = useRef<HTMLInputElement>(null);
-  const [avatarUploading, setAvatarUploading] = useState(false);
 
-  async function handleAvatarSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if(!file || !user) return;
-    setAvatarUploading(true);
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent">("idle");
 
+  async function handleResendVerification() {
+    setResendStatus("sending");
     try {
-      const updated = await uploadAvatarRequest(file);
-      setUser(updated);
-    } finally {
-      setAvatarUploading(false);
-      if(avatarInputRef.current) avatarInputRef.current.value = "";
-    }
-  }
-
-  async function handleAvatarRemove() {
-    if(!user) return;
-    setAvatarUploading(true);
-    try {
-      const updated = await removeAvatarRequest();
-      setUser(updated);
-    } finally {
-      setAvatarUploading(false);
+      await resendVerificationRequest();
+      setResendStatus("sent");
+      setTimeout(() => setResendStatus("idle"), 4000);
+    } catch {
+      setResendStatus("idle");
     }
   }
 
@@ -74,6 +74,34 @@ export default function SettingsPage() {
     } catch (err) {
       setProfileError(err instanceof Error ? err.message : "Failed to save");
       setProfileStatus("error");
+    }
+  }
+
+  // --- Avatar upload/remove ---
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
+  async function handleAvatarSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setAvatarUploading(true);
+    try {
+      const updated = await uploadAvatarRequest(file);
+      setUser(updated);
+    } finally {
+      setAvatarUploading(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+    }
+  }
+
+  async function handleAvatarRemove() {
+    if (!user) return;
+    setAvatarUploading(true);
+    try {
+      const updated = await removeAvatarRequest();
+      setUser(updated);
+    } finally {
+      setAvatarUploading(false);
     }
   }
 
@@ -180,13 +208,6 @@ export default function SettingsPage() {
                   </button>
                 )}
               </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">{user.name}</p>
-                <p className="text-xs text-ink-faint">
-                  {user.username ? `@${user.username} · ` : ""}
-                  <span className="capitalize">{user.role}</span>
-                </p>
-              </div>
             </div>
 
             <div className="space-y-4 p-6">
@@ -210,6 +231,32 @@ export default function SettingsPage() {
                 <p className="mt-1 text-[11px] text-ink-faint">
                   Email changes aren&apos;t supported yet
                 </p>
+
+                <div className="mt-3 flex items-center gap-2">
+                  {user.emailVerified ? (
+                    <span className="flex items-center gap-1.5 rounded-full bg-rise/15 px-2.5 py-1 text-xs font-medium text-rise">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Verified
+                    </span>
+                  ) : (
+                    <>
+                      <span className="flex items-center gap-1.5 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-medium text-gold">
+                        <Mail className="h-3.5 w-3.5" />
+                        Not verified
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={resendStatus !== "idle"}
+                        className="text-xs font-medium text-brand hover:text-brand-hover disabled:opacity-60"
+                      >
+                        {resendStatus === "idle" && "Resend email"}
+                        {resendStatus === "sending" && "Sending..."}
+                        {resendStatus === "sent" && "Sent!"}
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
               {profileStatus === "error" && (

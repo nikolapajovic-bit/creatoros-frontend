@@ -20,7 +20,7 @@ interface ContractApiResponse {
   creatorSigned: boolean;
   brandSigned: boolean;
   sentBy?: string;
-  finalPdfUrl?: string;
+  finalPdfPublicId?: string;
   revisionRequests: RevisionRequestApiResponse[];
 }
 
@@ -34,14 +34,14 @@ function mapContract(
     brand: raw.brand,
     bodyText: raw.bodyText,
     status: raw.status,
-    value: raw.value,
+    value: Number(raw.value),
     currency: raw.currency,
     createdDate: raw.createdAt,
     expiryDate: raw.expiryDate,
     creatorSigned: raw.creatorSigned,
     brandSigned: raw.brandSigned,
     sentByBrand: !!raw.sentBy,
-    finalPdfUrl: raw.finalPdfUrl,
+    hasFinalPdf: !!raw.finalPdfPublicId,
     revisionRequests: (raw.revisionRequests ?? []).map((r) => ({
       message: r.message,
       requestedByMe: r.requestedBy === currentUserId,
@@ -180,6 +180,10 @@ export async function withdrawContractRequest(id: string): Promise<Contract> {
       method: "PATCH",
     },
   );
-
   return mapContract(data.contract);
+}
+
+export async function getSignedPdfUrlRequest(id: string): Promise<string> {
+  const data = await apiFetch<{ url: string }>(`/contracts/${id}/pdf-url`);
+  return data.url;
 }

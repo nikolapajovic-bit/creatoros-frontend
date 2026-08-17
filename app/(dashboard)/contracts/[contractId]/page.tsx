@@ -13,6 +13,8 @@ import { formatCurrency } from "@/lib/utils";
 import { CONTRACT_STATUSES } from "@/types/contract";
 import { useContract } from "@/hooks/use-contracts";
 import { useAuthStore } from "@/store/auth-store";
+import { useState } from "react";
+import { getSignedPdfUrlRequest } from "@/lib/api/contracts";
 
 const STATUS_CONFIG = Object.fromEntries(CONTRACT_STATUSES.map((s) => [s.key, s]));
 
@@ -20,6 +22,21 @@ export default function ContractDetailPage() {
   const params = useParams<{ contractId: string }>();
   const { data: contract, isLoading, isError } = useContract(params.contractId);
   const user = useAuthStore((s) => s.user);
+  const [downloading, setDownloading] = useState(false);
+
+  async function handleDownload() {
+    if(!contract) return;
+    setDownloading(true);
+
+    try {
+      const url = await getSignedPdfUrlRequest(contract.id);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch {
+
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -112,16 +129,19 @@ export default function ContractDetailPage() {
               <ContractRevisionActions contract={contract} />
             )}
 
-            {contract.status === "signed" && contract.finalPdfUrl ? (
-              <a
-                href={`http://localhost:5000${contract.finalPdfUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-xl bg-surface-raised px-3.5 py-2 text-xs font-medium text-ink-muted transition-colors hover:bg-surface hover:text-ink"
+            {contract.status === "signed" && contract.hasFinalPdf ? (
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="flex items-center gap-1.5 rounded-xl bg-surface-raised px-3.5 py-2 text-xs font-medium text-ink-muted transition-colors hover:bg-surface hover:text-ink disabled:opacity-60"
               >
-                <Download className="h-3.5 w-3.5" />
-                Download signed PDF
-              </a>
+                {downloading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Download className="h-3.5 w-3.5" />
+                )}
+                {downloading ? 'Preparing...' : 'Download signed PDF'}
+              </button>
             ) : (
               <button
                 disabled
