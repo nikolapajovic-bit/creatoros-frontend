@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X, ArrowUpRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +18,12 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-3 z-50 mx-3 mb-3 rounded-2xl bg-surface/70 shadow-glow ring-1 ring-foreground/10 backdrop-blur-xl md:mx-6">
+    <motion.header
+      initial={{ opacity: 0, y: -16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="sticky top-3 z-50 mx-3 mb-3 rounded-2xl bg-surface/70 shadow-glow ring-1 ring-foreground/10 backdrop-blur-xl md:mx-6"
+    >
       <div className="flex h-14 items-center justify-between gap-4 px-4 md:px-5">
         <Link href="/" className="flex shrink-0 items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -40,7 +46,7 @@ export function Navbar() {
           <Button asChild variant="ghost">
             <Link href="/login">Log in</Link>
           </Button>
-          <Button asChild className="group">
+          <Button asChild className="group bg-linear-to-r from-brand to-brand-hover shadow-glow transition-transform hover:scale-105">
             <Link href="/register">
               Start free
               <ArrowUpRight className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -59,7 +65,7 @@ export function Navbar() {
 
       <div
         className={cn(
-          "grid overflow-hidden px-4 transition-[grid-template-rows] duration-200 md:hidden",
+          "grid overflow-hidden px-4 transition-[grid-template-rows] duration-300 md:hidden",
           open ? "grid-rows-[1fr] pb-4" : "grid-rows-[0fr]"
         )}
       >
@@ -86,6 +92,6 @@ export function Navbar() {
           </div>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }

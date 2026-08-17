@@ -1,3 +1,7 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 const STEPS = [
   {
     n: "01",
@@ -20,38 +24,56 @@ export function HowItWorks() {
   return (
     <section id="how-it-works" className="px-3 py-20 md:px-6">
       <div className="mx-auto max-w-6xl">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="font-mono text-xs uppercase tracking-widest text-ink-faint">
-            From first message to paid
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <p className="text-sm font-medium text-brand">From first message to paid</p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Up and running in three steps
           </h2>
-        </div>
+        </motion.div>
 
-        <div className="mt-12 overflow-hidden rounded-2xl bg-surface ring-1 ring-foreground/10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="relative mt-12 overflow-hidden rounded-2xl bg-surface ring-1 ring-foreground/10"
+        >
           <div className="bg-linear-to-b from-brand/10 to-transparent px-6 py-4">
             <p className="text-sm font-medium text-foreground">Onboarding</p>
           </div>
 
           <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-3 md:gap-6 md:p-8">
-            {STEPS.map((step) => (
-              <div key={step.n} className="flex gap-3.5">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-muted font-mono text-xs font-semibold text-brand">
+            {STEPS.map((step, i) => (
+              <motion.div
+                key={step.n}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: 0.2 + i * 0.15, duration: 0.4 }}
+                className="flex gap-3.5"
+              >
+                <motion.span
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-muted font-mono text-xs font-semibold text-brand"
+                >
                   {step.n}
-                </span>
+                </motion.span>
                 <div>
-                  <h3 className="text-[15px] font-semibold text-foreground">
-                    {step.title}
-                  </h3>
+                  <h3 className="text-[15px] font-semibold text-foreground">{step.title}</h3>
                   <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
                     {step.desc}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,5 +1,8 @@
+"use client";
+
 import * as React from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import {
   MessageSquare,
   CalendarDays,
@@ -34,10 +37,14 @@ export function FeatureBento() {
   return (
     <section id="features" className="px-3 py-20 md:px-6">
       <div className="mx-auto max-w-6xl">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="font-mono text-xs uppercase tracking-widest text-ink-faint">
-            Everything after &ldquo;yes&rdquo;
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <p className="text-sm font-medium text-brand">Everything after &ldquo;yes&rdquo;</p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             The whole deal, not just the DM
           </h2>
@@ -45,7 +52,7 @@ export function FeatureBento() {
             From the first pitch to the final invoice — every tool a working
             creator or brand team actually needs.
           </p>
-        </div>
+        </motion.div>
 
         <div className="mt-14 grid grid-cols-1 gap-4 lg:grid-cols-6">
           <FeatureCard
@@ -54,6 +61,7 @@ export function FeatureBento() {
             eyebrow="Deals"
             title="See every deal, from inquiry to paid"
             desc="Track pipeline value, response rate, and where each brand stands — Inquiry, Negotiating, Contract sent, In progress, Completed."
+            delay={0}
           >
             <Image
               src="/screenshots/deals_awaiting.png"
@@ -70,6 +78,7 @@ export function FeatureBento() {
             eyebrow="Contracts"
             title="Send it, sign it, done"
             desc="Draft a contract, send it for e-signature, and get notified the moment it's signed."
+            delay={0.1}
           >
             <Image
               src="/screenshots/contract.png"
@@ -86,6 +95,7 @@ export function FeatureBento() {
             eyebrow="AI Studio"
             title="Never stare at a blank caption box"
             desc="Generate captions, content ideas, hashtags, and brand-email replies in your voice."
+            delay={0.15}
           >
             <Image
               src="/screenshots/ai_studio.png"
@@ -102,6 +112,7 @@ export function FeatureBento() {
             eyebrow="Analytics"
             title="Real numbers, synced automatically"
             desc="Followers, engagement rate, and top posts pulled straight from Instagram, TikTok, and YouTube."
+            delay={0.2}
           >
             <Image
               src="/screenshots/analyticsos.png"
@@ -114,9 +125,14 @@ export function FeatureBento() {
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {SMALL_FEATURES.map(({ icon: Icon, title, desc }) => (
-            <div
+          {SMALL_FEATURES.map(({ icon: Icon, title, desc }, i) => (
+            <motion.div
               key={title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ delay: i * 0.08, duration: 0.4 }}
+              whileHover={{ y: -3 }}
               className="rounded-2xl bg-surface p-5 ring-1 ring-foreground/10 transition-colors hover:bg-surface-raised/60"
             >
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-brand-muted text-brand">
@@ -128,7 +144,7 @@ export function FeatureBento() {
               <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
                 {desc}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -142,6 +158,7 @@ function FeatureCard({
   desc,
   children,
   glow,
+  delay = 0,
   className = "",
 }: {
   eyebrow: string;
@@ -149,18 +166,24 @@ function FeatureCard({
   desc: string;
   children: React.ReactNode;
   glow: "brand" | "gold";
+  delay?: number;
   className?: string;
 }) {
   const glowBg = glow === "brand" ? "bg-brand/15" : "bg-gold/15";
   const washFrom = glow === "brand" ? "from-brand/10" : "from-gold/10";
 
   return (
-    <div
-      className={`group relative overflow-hidden rounded-2xl bg-linear-to-b ${washFrom} to-transparent p-5 ring-1 ring-foreground/10 ${className}`}
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ delay, duration: 0.5 }}
+      whileHover={{ y: -4 }}
+      className={`group relative overflow-hidden rounded-2xl bg-linear-to-b ${washFrom} to-transparent p-5 ring-1 ring-foreground/10 transition-shadow hover:shadow-glow ${className}`}
     >
       <div className={`pointer-events-none absolute -top-16 right-0 h-40 w-40 rounded-full ${glowBg} blur-[80px]`} />
 
-      <p className="relative font-mono text-xs uppercase tracking-widest text-ink-faint">
+      <p className="relative text-xs font-semibold uppercase tracking-wide text-ink-faint">
         {eyebrow}
       </p>
       <h3 className="relative mt-1.5 font-display text-[17px] font-semibold text-foreground">
@@ -169,9 +192,13 @@ function FeatureCard({
       <p className="relative mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
         {desc}
       </p>
-      <div className="relative mt-4 overflow-hidden rounded-xl bg-canvas/40">
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.3 }}
+        className="relative mt-4 overflow-hidden rounded-xl bg-canvas/40"
+      >
         {children}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

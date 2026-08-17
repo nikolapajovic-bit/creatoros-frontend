@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Check, Sparkles } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -50,59 +51,101 @@ export function Pricing() {
   return (
     <section id="pricing" className="px-3 py-20 md:px-6">
       <div className="mx-auto max-w-4xl">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="font-mono text-xs uppercase tracking-widest text-ink-faint">
-            Pricing
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <p className="text-sm font-medium text-brand">Pricing</p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Start free. Upgrade when it pays for itself.
           </h2>
           <p className="mt-4 text-[15px] text-muted-foreground">
             You can always switch plans later from Settings.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mx-auto mt-8 flex w-fit items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-foreground/10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="mx-auto mt-8 flex w-fit items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-foreground/10"
+        >
           {(["creator", "brand"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={cn(
-                "rounded-full px-5 py-2 text-[13.5px] font-medium capitalize transition-colors",
-                tab === t
-                  ? "bg-brand text-white shadow-glow"
-                  : "text-ink-muted hover:text-ink"
+                "relative rounded-full px-5 py-2 text-[13.5px] font-medium capitalize transition-colors",
+                tab === t ? "text-white" : "text-ink-muted hover:text-ink"
               )}
             >
-              {t === "creator" ? "For creators" : "For brands"}
+              {tab === t && (
+                <motion.span
+                  layoutId="pricing-tab-bg"
+                  className="absolute inset-0 rounded-full bg-brand shadow-glow"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <span className="relative">{t === "creator" ? "For creators" : "For brands"}</span>
             </button>
           ))}
-        </div>
+        </motion.div>
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Free */}
-          <div className="rounded-2xl bg-surface p-7 ring-1 ring-foreground/10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+            whileHover={{ y: -4 }}
+            className="rounded-2xl bg-surface p-7 ring-1 ring-foreground/10 transition-shadow hover:shadow-lg"
+          >
             <p className="text-[15px] font-semibold text-foreground">Free</p>
             <p className="mt-3 font-mono text-4xl font-semibold text-foreground">
               $0
               <span className="text-sm font-normal text-ink-faint"> forever</span>
             </p>
-            <ul className="mt-6 space-y-3">
-              {plan.free.map((f) => (
-                <li key={f} className="flex items-start gap-2.5 text-sm text-ink">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" />
-                  {f}
-                </li>
-              ))}
-            </ul>
+            <AnimatePresence mode="wait">
+              <motion.ul
+                key={tab}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="mt-6 space-y-3"
+              >
+                {plan.free.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" />
+                    {f}
+                  </li>
+                ))}
+              </motion.ul>
+            </AnimatePresence>
             <Button asChild variant="outline" size="lg" className="mt-8 w-full">
               <Link href="/register">Continue with Free</Link>
             </Button>
-          </div>
+          </motion.div>
 
-          {/* Pro — same gradient recipe as the sidebar's Upgrade to Pro nudge */}
-          <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-brand/20 to-gold/20 p-7 ring-1 ring-brand/30 shadow-glow">
-            <div className="pointer-events-none absolute -top-16 right-0 h-40 w-40 rounded-full bg-brand/20 blur-[80px]" />
+          {/* Pro */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+            whileHover={{ y: -4 }}
+            className="relative overflow-hidden rounded-2xl bg-linear-to-r from-brand/20 to-gold/20 p-7 ring-1 ring-brand/30 shadow-glow"
+          >
+            <motion.div
+              className="pointer-events-none absolute -top-16 right-0 h-40 w-40 rounded-full bg-brand/20 blur-[80px]"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            />
 
             <span className="relative inline-flex items-center rounded-full bg-brand px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
               Recommended
@@ -111,23 +154,41 @@ export function Pricing() {
               <Sparkles className="h-4 w-4 text-brand" />
               Pro
             </p>
-            <p className="relative mt-3 font-mono text-4xl font-semibold text-foreground">
-              ${plan.pro.price}
-              <span className="text-sm font-normal text-ink-faint">/month</span>
-            </p>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={tab}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.2 }}
+                className="relative mt-3 font-mono text-4xl font-semibold text-foreground"
+              >
+                ${plan.pro.price}
+                <span className="text-sm font-normal text-ink-faint">/month</span>
+              </motion.p>
+            </AnimatePresence>
             <p className="relative mt-1 text-xs text-ink-faint">Cancel anytime</p>
-            <ul className="relative mt-6 space-y-3">
-              {plan.pro.features.map((f) => (
-                <li key={f} className="flex items-start gap-2.5 text-sm text-ink">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-rise" />
-                  {f}
-                </li>
-              ))}
-            </ul>
+            <AnimatePresence mode="wait">
+              <motion.ul
+                key={tab}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="relative mt-6 space-y-3"
+              >
+                {plan.pro.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-rise" />
+                    {f}
+                  </li>
+                ))}
+              </motion.ul>
+            </AnimatePresence>
             <Button asChild size="lg" className="relative mt-8 w-full">
               <Link href={`/register?plan=pro&as=${tab}`}>Start with Pro</Link>
             </Button>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

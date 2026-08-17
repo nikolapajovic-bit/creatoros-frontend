@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 const CREATOR_POINTS = [
@@ -20,14 +23,18 @@ export function AudienceSplit() {
   return (
     <section id="for-brands" className="px-3 py-20 md:px-6">
       <div className="mx-auto max-w-6xl">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="font-mono text-xs uppercase tracking-widest text-ink-faint">
-            One platform, two sides of the table
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <p className="text-sm font-medium text-brand">One platform, two sides of the table</p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Built for creators. Built for brands. Built together.
           </h2>
-        </div>
+        </motion.div>
 
         <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-2">
           <AudienceCard
@@ -38,6 +45,7 @@ export function AudienceSplit() {
             glow="bg-brand/20"
             wash="from-brand/10"
             cta={{ href: "/register?as=creator", label: "Start as a creator" }}
+            delay={0}
           />
           <AudienceCard
             badge="For brands"
@@ -47,6 +55,7 @@ export function AudienceSplit() {
             glow="bg-gold/20"
             wash="from-gold/10"
             cta={{ href: "/register?as=brand", label: "Start as a brand" }}
+            delay={0.15}
           />
         </div>
       </div>
@@ -62,6 +71,7 @@ function AudienceCard({
   glow,
   wash,
   cta,
+  delay,
 }: {
   badge: string;
   badgeClass: string;
@@ -70,10 +80,22 @@ function AudienceCard({
   glow: string;
   wash: string;
   cta: { href: string; label: string };
+  delay: number;
 }) {
   return (
-    <div className={`relative flex flex-col overflow-hidden rounded-2xl bg-linear-to-b ${wash} to-transparent p-7 ring-1 ring-foreground/10`}>
-      <div className={`pointer-events-none absolute -top-20 right-0 h-48 w-48 rounded-full ${glow} blur-[90px]`} />
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ delay, duration: 0.5 }}
+      whileHover={{ y: -4 }}
+      className={`relative flex flex-col overflow-hidden rounded-2xl bg-linear-to-b ${wash} to-transparent p-7 ring-1 ring-foreground/10 transition-shadow hover:shadow-glow`}
+    >
+      <motion.div
+        className={`pointer-events-none absolute -top-20 right-0 h-48 w-48 rounded-full ${glow} blur-[90px]`}
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay }}
+      />
 
       <span className={`relative inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}`}>
         {badge}
@@ -82,11 +104,18 @@ function AudienceCard({
         {title}
       </h3>
       <ul className="relative mt-5 flex-1 space-y-3">
-        {points.map((point) => (
-          <li key={point} className="flex items-start gap-2.5 text-sm text-ink">
+        {points.map((point, i) => (
+          <motion.li
+            key={point}
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: delay + 0.1 + i * 0.06, duration: 0.3 }}
+            className="flex items-start gap-2.5 text-sm text-ink"
+          >
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-rise" />
             {point}
-          </li>
+          </motion.li>
         ))}
       </ul>
       <Button asChild variant="link" className="relative mt-7 h-auto w-fit px-0 text-sm font-semibold text-foreground no-underline hover:no-underline">
@@ -95,6 +124,6 @@ function AudienceCard({
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
       </Button>
-    </div>
+    </motion.div>
   );
 }

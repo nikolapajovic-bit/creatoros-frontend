@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const COLUMNS = [
   {
@@ -30,7 +33,13 @@ const COLUMNS = [
 export function Footer() {
   return (
     <footer className="px-3 pb-8 pt-4 md:px-6">
-      <div className="mx-auto max-w-6xl rounded-2xl bg-surface/60 p-8 ring-1 ring-foreground/10 backdrop-blur-xl sm:p-10">
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 0.5 }}
+        className="mx-auto max-w-6xl rounded-2xl bg-surface/60 p-8 ring-1 ring-foreground/10 backdrop-blur-xl sm:p-10"
+      >
         <div className="flex flex-col justify-between gap-12 md:flex-row">
           <div className="max-w-xs">
             <Link href="/" className="flex items-center">
@@ -69,7 +78,7 @@ export function Footer() {
             © {new Date().getFullYear()} CreatorOS. All rights reserved.
           </p>
         </div>
-      </div>
+      </motion.div>
     </footer>
   );
 }

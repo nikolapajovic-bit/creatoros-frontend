@@ -1,20 +1,96 @@
+"use client";
+
+import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, TrendingUp, CheckCheck } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { formatCurrency, formatPercent } from "@/lib/utils";
 
 export function Hero() {
+  const ref = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), {
+    stiffness: 150,
+    damping: 20,
+  });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), {
+    stiffness: 150,
+    damping: 20,
+  });
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
+    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
+  }
+
+  function handleMouseLeave() {
+    mouseX.set(0);
+    mouseY.set(0);
+  }
+
   return (
-    <section className="px-3 pb-20 pt-10 md:px-6 sm:pt-16">
-      <div className="mx-auto max-w-3xl text-center">
-        <p className="font-mono text-xs uppercase tracking-widest text-ink-faint">
-          For creators &amp; the brands who book them
-        </p>
-        <h1 className="mt-3 font-display text-[2.5rem] font-semibold leading-[1.08] tracking-tight text-foreground sm:text-6xl">
+    <section className="relative overflow-hidden px-3 pb-24 pt-20 md:px-6 sm:pt-28">
+      {/* Animirana gradient pozadina — sporo pluta u krug */}
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-0 h-150 w-225 -translate-x-1/2 rounded-full bg-brand/15 blur-[130px]"
+        animate={{
+          x: [0, 60, -40, 0],
+          y: [0, 40, -30, 0],
+          scale: [1, 1.1, 0.95, 1],
+        }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="pointer-events-none absolute right-0 top-32 h-100 w-125 rounded-full bg-gold/10 blur-[110px]"
+        animate={{
+          x: [0, -50, 30, 0],
+          y: [0, 30, -20, 0],
+        }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Dot-grid pattern */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.15]"
+        style={{
+          backgroundImage: "radial-gradient(circle, var(--surface-border) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+          maskImage: "radial-gradient(ellipse 60% 50% at 50% 0%, black 40%, transparent 100%)",
+        }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative mx-auto max-w-2xl text-center"
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="inline-flex items-center gap-1.5 rounded-full bg-surface-raised/80 px-3 py-1.5 text-xs font-medium text-ink-muted ring-1 ring-foreground/10 backdrop-blur-sm"
+        >
+          <motion.span
+            animate={{ rotate: [0, 15, -15, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Sparkles className="h-3.5 w-3.5 text-brand" />
+          </motion.span>
+          Built for creators and the brands who book them
+        </motion.div>
+
+        <h1 className="mt-6 font-display text-[2.5rem] font-semibold leading-[1.1] tracking-tight text-foreground sm:text-6xl">
           Every brand deal,
           <br />
-          <span className="text-brand">one command center.</span>
+          <span className="bg-linear-to-r from-brand via-brand-hover to-brand bg-size-[200%_auto] bg-clip-text text-transparent animate-gradient-x">
+            one command center.
+          </span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-muted-foreground">
@@ -24,9 +100,13 @@ export function Hero() {
         </p>
 
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button asChild size="lg" className="group h-12 w-full px-6 text-[15px] sm:w-auto">
+          <Button
+            asChild
+            size="lg"
+            className="group h-12 w-full bg-linear-to-r from-brand to-brand-hover px-6 text-[15px] shadow-glow transition-transform hover:scale-105 sm:w-auto"
+          >
             <Link href="/register">
-              Start free — no card needed
+              Start for free
               <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
             </Link>
           </Button>
@@ -35,45 +115,36 @@ export function Hero() {
           </Button>
         </div>
         <p className="mt-4 text-xs text-ink-faint">
-          Free forever for up to 5 active deals · Upgrade anytime
+          Free for up to 5 active deals. No credit card required.
         </p>
-      </div>
+      </motion.div>
 
-      {/* Product mockup — glass panel, matching the dashboard hero card recipe */}
-      <div className="relative mx-auto mt-16 max-w-5xl">
-        {/* Floating stat chips — siblings of the clipped panel, so they can hang outside it */}
-        <div className="absolute -left-4 top-14 z-10 hidden w-56 rounded-xl bg-surface/95 p-3.5 ring-1 ring-foreground/10 shadow-glow backdrop-blur-xl sm:block sm:-left-8 md:-left-14">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rise-muted text-rise">
-              <CheckCheck className="h-4 w-4" />
-            </span>
-            <div>
-              <p className="text-sm font-medium text-ink">Deal accepted</p>
-              <p className="font-mono text-xs text-ink-faint">
-                Test Brand · {formatCurrency(450)}
-              </p>
+      {/* Screenshot — 3D tilt prateći miša + kontinuirano lebdenje */}
+      <div
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="relative mx-auto mt-16 max-w-4xl"
+        style={{ perspective: "1200px" }}
+      >
+        <motion.div
+          style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+          initial={{ opacity: 0, y: 40 }}
+          animate={{
+            opacity: 1,
+            y: [0, -12, 0],
+          }}
+          transition={{
+            opacity: { duration: 0.6, delay: 0.2 },
+            y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
+          }}
+        >
+          <div className="overflow-hidden rounded-2xl bg-surface ring-1 ring-foreground/10 shadow-glow">
+            <div className="flex items-center gap-1.5 border-b border-surface-border/60 bg-surface-raised/50 px-4 py-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-fall/40" />
+              <span className="h-2.5 w-2.5 rounded-full bg-gold/40" />
+              <span className="h-2.5 w-2.5 rounded-full bg-rise/40" />
             </div>
-          </div>
-        </div>
-
-        <div className="absolute -right-4 bottom-8 z-10 hidden w-52 rounded-xl bg-surface/95 p-3.5 ring-1 ring-foreground/10 shadow-glow backdrop-blur-xl sm:block sm:-right-6 md:-right-12">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gold-muted text-gold">
-              <TrendingUp className="h-4 w-4" />
-            </span>
-            <div>
-              <p className="font-mono text-sm font-medium text-ink">82.4K</p>
-              <p className="text-xs text-rise">{formatPercent(3.8)} followers</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Clipped inner panel — holds the glow blobs and the screenshot */}
-        <div className="relative overflow-hidden rounded-2xl bg-surface/60 p-2 ring-1 ring-foreground/10 shadow-glow backdrop-blur-xl sm:p-3">
-          <div className="pointer-events-none absolute -top-24 left-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-brand/20 blur-[100px]" />
-          <div className="pointer-events-none absolute -bottom-16 right-0 h-56 w-56 rounded-full bg-gold/15 blur-[90px]" />
-
-          <div className="relative overflow-hidden rounded-xl ring-1 ring-foreground/10">
             <Image
               src="/screenshots/overview_creator.png"
               alt="CreatorOS dashboard overview showing pipeline, response rate, and this week's schedule"
@@ -83,7 +154,7 @@ export function Hero() {
               className="w-full"
             />
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
