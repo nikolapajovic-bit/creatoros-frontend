@@ -14,14 +14,6 @@ const COLUMNS = [
     ],
   },
   {
-    title: "Company",
-    links: [
-      { label: "About", href: "/about" },
-      { label: "Contact", href: "/contact" },
-      { label: "Careers", href: "/careers" },
-    ],
-  },
-  {
     title: "Legal",
     links: [
       { label: "Privacy policy", href: "/privacy" },
