@@ -14,6 +14,7 @@ export interface Conversation {
   name: string;
   type: ConversationType;
   lastMessage: string;
+  lastMessageSentByMe: boolean;
   lastMessageAt: string;
   unreadCount: number;
   online?: boolean;

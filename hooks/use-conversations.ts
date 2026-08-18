@@ -17,6 +17,7 @@ export function useConversations() {
   useEffect(() => {
     const socket = getSocket();
     function refreshConversations() {
+      console.log("🔄 Refreshing conversations list (socket event received)");
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     }
     socket.on("message:new", refreshConversations);

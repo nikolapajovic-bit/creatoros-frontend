@@ -71,7 +71,18 @@ export function ConversationList({ conversations, activeId, onSelect }: Conversa
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-xs text-muted-foreground">{conv.lastMessage}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {conv.lastMessage ? (
+                        <>
+                          <span className="text-ink-faint">
+                            {conv.lastMessageSentByMe ? "You" : conv.name}:
+                          </span>{" "}
+                          {conv.lastMessage}
+                        </>
+                      ) : (
+                        <span className="italic text-ink-faint">No messages yet</span>
+                      )}
+                    </p>
                     {conv.unreadCount > 0 && (
                       <span className="flex h-4.5 min-w-4.5 shrink-0 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white shadow-glow">
                         {conv.unreadCount}
@@ -87,7 +98,7 @@ export function ConversationList({ conversations, activeId, onSelect }: Conversa
                   setToDelete(conv);
                 }}
                 aria-label="Delete conversation"
-                className="absolute right-2 top-3 flex h-7 w-7 items-center justify-center rounded-lg text-ink-faint opacity-0 transition-all hover:bg-fall/15 hover:text-fall group-hover:opacity-100"
+                className="absolute right-2 top-3 flex h-7 w-7 items-center justify-center rounded-lg text-ink-faint opacity-100 transition-all hover:bg-fall/15 hover:text-fall md:opacity-0 group-hover:opacity-100"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -100,7 +111,7 @@ export function ConversationList({ conversations, activeId, onSelect }: Conversa
         open={!!toDelete}
         onOpenChange={(open) => !open && setToDelete(null)}
         title="Delete conversation?"
-        description={`This will remove "${toDelete?.name}" from your inbox. You'll still be able to message them again later.`}
+        description={`This will remove "${toDelete?.name}" from your inbox. You'll still be able to message them again within a normal conversation.`}
         confirmLabel="Delete"
         onConfirm={handleConfirmDelete}
         isPending={deleteConversation.isPending}

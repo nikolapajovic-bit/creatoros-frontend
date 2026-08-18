@@ -6,6 +6,8 @@ interface ConversationApiResponse {
   name: string;
   type: Conversation["type"];
   lastMessageAt: string;
+  lastMessageText?: string;
+  lastMessageSenderId?: string;
   participants: { _id: string; name: string; email: string }[];
 }
 
@@ -17,10 +19,7 @@ interface MessageApiResponse {
   createdAt: string;
 }
 
-type ConversationSummary = Omit<
-  Conversation,
-  "messages" | "lastMessage" | "unreadCount"
->;
+type ConversationSummary = Omit<Conversation, "messages" | "unreadCount">;
 
 export function mapMessage(
   raw: MessageApiResponse,
@@ -53,6 +52,8 @@ function mapConversation(
     id: raw._id,
     name: displayName,
     type: raw.type,
+    lastMessage: raw.lastMessageText ?? "",
+    lastMessageSentByMe: raw.lastMessageSenderId === currentUserId,
     lastMessageAt: raw.lastMessageAt,
   };
 }
