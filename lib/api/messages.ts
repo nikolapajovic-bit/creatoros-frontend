@@ -8,7 +8,12 @@ interface ConversationApiResponse {
   lastMessageAt: string;
   lastMessageText?: string;
   lastMessageSenderId?: string;
-  participants: { _id: string; name: string; email: string }[];
+  participants: {
+    _id: string;
+    name: string;
+    email: string;
+    avatarUrl?: string;
+  }[];
 }
 
 interface MessageApiResponse {
@@ -47,10 +52,13 @@ function mapConversation(
   );
   const displayName =
     raw.type === "team" ? raw.name : (otherParticipant?.name ?? raw.name);
+  const avatarUrl =
+    raw.type === "team" ? undefined : otherParticipant?.avatarUrl;
 
   return {
     id: raw._id,
     name: displayName,
+    avatarUrl,
     type: raw.type,
     lastMessage: raw.lastMessageText ?? "",
     lastMessageSentByMe: raw.lastMessageSenderId === currentUserId,

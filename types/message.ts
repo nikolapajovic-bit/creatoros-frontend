@@ -12,6 +12,7 @@ export interface Message {
 export interface Conversation {
   id: string;
   name: string;
+  avatarUrl?: string;
   type: ConversationType;
   lastMessage: string;
   lastMessageSentByMe: boolean;

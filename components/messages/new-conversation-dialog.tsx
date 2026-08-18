@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { brandGradient, brandInitial } from "@/lib/brand-visual";
+import { resolveFileUrl } from "@/lib/file-url";
 import { lookupUserByEmail, getBusinessContactsRequest, type BusinessContact } from "@/lib/api/users";
 import { createConversationRequest } from "@/lib/api/messages";
 import { useAuthStore } from "@/store/auth-store";
@@ -118,14 +119,23 @@ export function NewConversationDialog({ onCreated }: { onCreated: (id: string) =
                         className="flex w-full items-center gap-3 rounded-xl border-2 border-transparent p-2.5 text-left transition-all hover:border-brand/30 hover:bg-brand-muted disabled:opacity-50"
                       >
                         <div
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-display text-sm font-semibold text-white shadow-glow"
-                          style={{ backgroundImage: brandGradient(c.name) }}
+                          className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full font-display text-sm font-semibold text-white shadow-glow"
+                          style={c.avatarUrl ? undefined : { backgroundImage: brandGradient(c.name) }}
                         >
-                          {brandInitial(c.name)}
+                          {c.avatarUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={resolveFileUrl(c.avatarUrl)}
+                              alt={c.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            brandInitial(c.name)
+                          )}
                         </div>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-foreground">{c.name}</p>
-                          <p className="truncate text-xs capitalize text-ink-faint">{c.role}</p>
+                          <p className="truncate text-xs text-ink-faint capitalize">{c.role}</p>
                         </div>
                       </button>
                     ))}
@@ -170,14 +180,14 @@ export function NewConversationDialog({ onCreated }: { onCreated: (id: string) =
                 <button
                   type="button"
                   onClick={() => setShowEmailSearch(false)}
-                  className="flex-1 rounded-xl bg-surface-raised px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:text-ink"
+                  className="flex-1 rounded-xl bg-surface-raised px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:text-ink"
                 >
                   Back
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-brand to-brand-hover px-4 py-2.5 text-sm font-semibold text-white shadow-glow transition-all disabled:opacity-60 disabled:shadow-none"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-brand to-brand-hover px-4 py-2 text-sm font-medium text-white shadow-glow transition-all disabled:opacity-60 disabled:shadow-none"
                 >
                   {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                   {submitting ? "Starting..." : "Start conversation"}

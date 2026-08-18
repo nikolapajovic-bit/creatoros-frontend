@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { brandGradient, brandInitial } from "@/lib/brand-visual";
+import { resolveFileUrl } from "@/lib/file-url";
 import { formatRelativeTime } from "@/lib/format-time";
 import { cn } from "@/lib/utils";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -44,12 +45,21 @@ export function ConversationList({ conversations, activeId, onSelect }: Conversa
                 <div className="relative shrink-0">
                   <div
                     className={cn(
-                      "flex h-10 w-10 items-center justify-center rounded-full font-display text-sm font-semibold text-white transition-shadow",
+                      "flex h-10 w-10 items-center justify-center overflow-hidden rounded-full font-display text-sm font-semibold text-white transition-shadow",
                       isActive && "shadow-glow"
                     )}
-                    style={{ backgroundImage: brandGradient(conv.name) }}
+                    style={conv.avatarUrl ? undefined : { backgroundImage: brandGradient(conv.name) }}
                   >
-                    {brandInitial(conv.name)}
+                    {conv.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={resolveFileUrl(conv.avatarUrl)}
+                        alt={conv.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      brandInitial(conv.name)
+                    )}
                   </div>
                   {conv.online && (
                     <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-rise ring-2 ring-surface" />
@@ -98,7 +108,7 @@ export function ConversationList({ conversations, activeId, onSelect }: Conversa
                   setToDelete(conv);
                 }}
                 aria-label="Delete conversation"
-                className="absolute right-2 top-3 flex h-7 w-7 items-center justify-center rounded-lg text-ink-faint opacity-100 transition-all hover:bg-fall/15 hover:text-fall md:opacity-0 group-hover:opacity-100"
+                className="absolute right-2 top-3 flex h-7 w-7 items-center justify-center rounded-lg text-ink-faint opacity-100 transition-all hover:bg-fall/15 hover:text-fall md:opacity-0 md:group-hover:opacity-100"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

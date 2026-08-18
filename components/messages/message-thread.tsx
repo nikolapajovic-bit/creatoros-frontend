@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Send } from "lucide-react";
+import { Send, ArrowLeft } from "lucide-react";
 import { brandGradient, brandInitial } from "@/lib/brand-visual";
+import { resolveFileUrl } from "@/lib/file-url";
 import { formatMessageTime } from "@/lib/format-time";
 import { cn } from "@/lib/utils";
 import { useMessages } from "@/hooks/use-messages";
@@ -10,9 +11,16 @@ import { useMessages } from "@/hooks/use-messages";
 interface MessageThreadProps {
   conversationId: string;
   conversationName: string;
+  conversationAvatarUrl?: string;
+  onBack?: () => void;
 }
 
-export function MessageThread({ conversationId, conversationName }: MessageThreadProps) {
+export function MessageThread({
+  conversationId,
+  conversationName,
+  conversationAvatarUrl,
+  onBack,
+}: MessageThreadProps) {
   const [draft, setDraft] = useState("");
   const { data: messages, isLoading, sendMessage } = useMessages(conversationId);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -31,11 +39,28 @@ export function MessageThread({ conversationId, conversationName }: MessageThrea
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 border-b border-surface-border/60 px-3 py-3 sm:gap-3 sm:px-5 sm:py-3.5">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-raised hover:text-ink md:hidden"
+          >
+            <ArrowLeft className="h-4.5 w-4.5" />
+          </button>
+        )}
         <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-display text-xs font-semibold text-white shadow-glow sm:h-9 sm:w-9 sm:text-sm"
-          style={{ backgroundImage: brandGradient(conversationName) }}
+          className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full font-display text-xs font-semibold text-white shadow-glow sm:h-9 sm:w-9 sm:text-sm"
+          style={conversationAvatarUrl ? undefined : { backgroundImage: brandGradient(conversationName) }}
         >
-          {brandInitial(conversationName)}
+          {conversationAvatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={resolveFileUrl(conversationAvatarUrl)}
+              alt={conversationName}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            brandInitial(conversationName)
+          )}
         </div>
         <p className="truncate text-sm font-medium text-foreground">{conversationName}</p>
       </div>
