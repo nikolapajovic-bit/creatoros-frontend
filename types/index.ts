@@ -17,8 +17,7 @@ export type ModuleKey =
   | "contracts"
   | "finance"
   | "ai-studio"
-  | "media"
-  | "notifications";
+  | "media";
 
 export interface ModuleDefinition {
   key: ModuleKey;

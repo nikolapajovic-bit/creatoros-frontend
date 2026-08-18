@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, Search, Settings, LogOut } from "lucide-react";
+import { Search, Settings, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { useNotifications } from "@/hooks/use-notifications";
+import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
 import { useAuthStore } from "@/store/auth-store";
 import { getInitials } from "@/lib/utils";
 import {
@@ -20,9 +19,6 @@ import {
 import { resolveFileUrl } from "@/lib/file-url";
 
 export function Topbar() {
-  const { data: notifications } = useNotifications();
-  const unreadCount = notifications?.filter((n) => !n.read).length ?? 0;
-
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
@@ -47,21 +43,7 @@ export function Topbar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Link
-          href="/notifications"
-          aria-label="Notifications"
-          className="relative flex h-9 w-9 items-center justify-center rounded-xl text-ink-muted transition-colors hover:bg-surface-raised hover:text-ink"
-        >
-          <Bell className="h-4.5 w-4.5" />
-          {unreadCount > 0 && (
-            <Badge
-              variant="gold"
-              className="absolute -top-1 -right-1 h-4 min-w-4 justify-center px-1 py-0 text-[10px]"
-            >
-              {unreadCount}
-            </Badge>
-          )}
-        </Link>
+        <NotificationDropdown />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

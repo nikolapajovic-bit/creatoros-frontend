@@ -9,7 +9,6 @@ import {
   Wallet,
   Sparkles,
   Images,
-  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -77,13 +76,6 @@ export const MODULES: ModuleDefinition[] = [
     description: "Photos and video assets",
     roles: ["creator", "brand", "agency", "admin"],
   },
-  {
-    key: "notifications",
-    label: "Notifications",
-    href: "/notifications",
-    description: "Deadlines, posts, collab reminders",
-    roles: ["creator", "brand", "agency", "moderator", "admin"],
-  },
 ];
 
 export const MODULE_ICONS: Record<ModuleDefinition["key"], LucideIcon> = {
@@ -96,7 +88,6 @@ export const MODULE_ICONS: Record<ModuleDefinition["key"], LucideIcon> = {
   finance: Wallet,
   "ai-studio": Sparkles,
   media: Images,
-  notifications: Bell,
 };
 
 export function modulesForRole(role: Role): ModuleDefinition[] {
