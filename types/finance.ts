@@ -12,6 +12,7 @@ export interface Invoice {
   status: InvoiceStatus;
   issuedDate: string;
   dueDate: string;
+  hasPdf: boolean;
 }
 
 export interface Payout {

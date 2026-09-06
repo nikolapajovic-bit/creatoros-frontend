@@ -13,6 +13,7 @@ interface InvoiceApiResponse {
   issuedDate: string;
   dueDate: string;
   billedTo?: string;
+  pdfPublicId?: string;
 }
 
 interface PayoutApiResponse {
@@ -36,6 +37,7 @@ function mapInvoice(raw: InvoiceApiResponse): Invoice {
     status: raw.status,
     issuedDate: raw.issuedDate,
     dueDate: raw.dueDate,
+    hasPdf: !!raw.pdfPublicId,
   };
 }
 
@@ -120,6 +122,28 @@ export async function getReceivedInvoicesRequest(): Promise<Invoice[]> {
   const data = await apiFetch<{ invoices: InvoiceApiResponse[] }>(
     "/finance/invoices/received",
   );
-
   return data.invoices.map(mapInvoice);
+}
+
+export async function createInvoiceFromContractRequest(
+  contractId: string,
+  notes?: string,
+): Promise<Invoice> {
+  const data = await apiFetch<{ invoice: InvoiceApiResponse }>(
+    "/finance/invoices/from-contract",
+    {
+      method: "POST",
+      body: JSON.stringify({ contractId, notes }),
+    },
+  );
+  return mapInvoice(data.invoice);
+}
+
+export async function getInvoicePdfUrlRequest(
+  invoiceId: string,
+): Promise<string> {
+  const data = await apiFetch<{ url: string }>(
+    `/finance/invoices/${invoiceId}/pdf-url`,
+  );
+  return data.url;
 }

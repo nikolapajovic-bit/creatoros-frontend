@@ -8,6 +8,7 @@ import { SignContractDialog } from "@/components/contracts/sign-contract-dialog"
 import { RevisionHistory } from "@/components/contracts/revision-history";
 import { ContractResponseActions } from "@/components/contracts/request-changes-dialog";
 import { ContractRevisionActions } from "@/components/contracts/revise-contract-dialog";
+import { CreateInvoiceDialog } from "@/components/contracts/create-invoice-dialog";
 import { brandGradient, brandInitial } from "@/lib/brand-visual";
 import { formatCurrency } from "@/lib/utils";
 import { CONTRACT_STATUSES } from "@/types/contract";
@@ -110,6 +111,15 @@ export default function ContractDetailPage() {
 
             {!isCreator && isChangesRequested && (
               <ContractRevisionActions contract={contract} />
+            )}
+
+            {isCreator && contract.status === 'signed' && (
+              <CreateInvoiceDialog
+                contractId={contract.id}
+                contractTitle={contract.title}
+                value={contract.value}
+                currency={contract.currency}
+              />
             )}
 
             {contract.status === "signed" && contract.hasFinalPdf ? (
