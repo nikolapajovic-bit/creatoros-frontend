@@ -1,16 +1,5 @@
-import { getAccessToken } from "@/lib/api/client";
+import { fetchWithAuth, API_URL } from "@/lib/api/client";
 import type { MediaAsset } from "@/types/media";
-
-const API_URL = (() => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-  if (typeof window !== "undefined") {
-    const port = process.env.NEXT_PUBLIC_API_PORT ?? "5000";
-    return `${window.location.protocol}//${window.location.hostname}:${port}/api`;
-  }
-  return "http://localhost:5000/api";
-})();
 
 interface MediaApiResponse {
   _id: string;
@@ -43,10 +32,7 @@ export function getMediaFileUrl(fileUrl: string): string {
 }
 
 export async function getMediaRequest(): Promise<MediaAsset[]> {
-  const res = await fetch(`${API_URL}/media`, {
-    credentials: "include",
-    headers: { Authorization: `Bearer ${getAccessToken()}` },
-  });
+  const res = await fetchWithAuth(`${API_URL}/media`);
   if (!res.ok) throw new Error("Failed to load media");
   const data = await res.json();
   return data.media.map(mapMedia);
@@ -64,10 +50,8 @@ export async function uploadMediaRequest(input: {
   formData.append("tags", input.tags.join(","));
   if (input.relatedBrand) formData.append("relatedBrand", input.relatedBrand);
 
-  const res = await fetch(`${API_URL}/media`, {
+  const res = await fetchWithAuth(`${API_URL}/media`, {
     method: "POST",
-    credentials: "include",
-    headers: { Authorization: `Bearer ${getAccessToken()}` },
     body: formData,
   });
 
@@ -81,10 +65,8 @@ export async function uploadMediaRequest(input: {
 }
 
 export async function deleteMediaRequest(id: string): Promise<void> {
-  const res = await fetch(`${API_URL}/media/${id}`, {
+  const res = await fetchWithAuth(`${API_URL}/media/${id}`, {
     method: "DELETE",
-    credentials: "include",
-    headers: { Authorization: `Bearer ${getAccessToken()}` },
   });
   if (!res.ok) throw new Error("Failed to delete media");
 }

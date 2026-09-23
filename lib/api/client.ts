@@ -1,6 +1,4 @@
 function resolveApiUrl(): string {
-  // Produkcija: potpun URL backend-a se prosleđuje preko env varijable
-  // (npr. https://creatoros-backend.onrender.com/api)
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
@@ -8,16 +6,13 @@ function resolveApiUrl(): string {
   const port = process.env.NEXT_PUBLIC_API_PORT ?? "5000";
 
   if (typeof window !== "undefined") {
-    // U browseru - koristi isti hostname sa kojeg je frontend otvoren
-    // (localhost -> localhost, 192.168.x.x -> ista IP adresa)
     return `${window.location.protocol}//${window.location.hostname}:${port}/api`;
   }
 
-  // Server-side (SSR) fallback - retko se koristi jer je apiFetch client-side, ali za svaki slucaj
   return `http://localhost:${port}/api`;
 }
 
-const API_URL = resolveApiUrl();
+export const API_URL = resolveApiUrl();
 
 // Access token se drži samo u memoriji (ne localStorage/cookie) — modul-level varijabla,
 // nestaje na refresh stranice po dizajnu (auth store će ga obnoviti preko /auth/refresh)
@@ -44,6 +39,61 @@ export class ApiError extends Error {
   }
 }
 
+// Sprečava da više istovremenih 401-ica pokrene više paralelnih refresh poziva —
+// svi čekaju na ISTI Promise
+let refreshInFlight: Promise<string | null> | null = null;
+
+async function refreshAccessTokenInternal(): Promise<string | null> {
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      try {
+        const res = await fetch(`${API_URL}/auth/refresh`, {
+          method: "POST",
+          credentials: "include",
+        });
+        if (!res.ok) return null;
+        const data = (await res.json()) as { accessToken: string };
+        accessToken = data.accessToken;
+        return accessToken;
+      } catch {
+        return null;
+      } finally {
+        refreshInFlight = null;
+      }
+    })();
+  }
+  return refreshInFlight;
+}
+
+/**
+ * Fetch sa automatskim Authorization header-om i tihim osvežavanjem tokena na 401.
+ * Koristi ovo (umesto golog fetch()) svuda gde treba poseban fetch poziv van apiFetch-a
+ * (npr. FormData upload) — garantuje isto ponašanje kao standardni JSON pozivi.
+ */
+export async function fetchWithAuth(
+  url: string,
+  options: RequestInit = {},
+  isRetry = false,
+): Promise<Response> {
+  const res = await fetch(url, {
+    ...options,
+    credentials: "include",
+    headers: {
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...options.headers,
+    },
+  });
+
+  if (res.status === 401 && !isRetry) {
+    const newToken = await refreshAccessTokenInternal();
+    if (newToken) {
+      return fetchWithAuth(url, options, true);
+    }
+  }
+
+  return res;
+}
+
 interface RequestOptions extends RequestInit {
   skipAuth?: boolean;
 }
@@ -51,12 +101,13 @@ interface RequestOptions extends RequestInit {
 export async function apiFetch<T>(
   path: string,
   options: RequestOptions = {},
+  isRetry = false,
 ): Promise<T> {
   const { skipAuth, headers, ...rest } = options;
 
   const res = await fetch(`${API_URL}${path}`, {
     ...rest,
-    credentials: "include", // šalje httpOnly refresh cookie na svaki zahtev
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(accessToken && !skipAuth
@@ -65,6 +116,13 @@ export async function apiFetch<T>(
       ...headers,
     },
   });
+
+  if (res.status === 401 && !skipAuth && !isRetry && path !== "/auth/refresh") {
+    const newToken = await refreshAccessTokenInternal();
+    if (newToken) {
+      return apiFetch<T>(path, options, true);
+    }
+  }
 
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as ApiErrorBody | null;
